@@ -97,9 +97,12 @@ End Sub
 Public Sub ConfigureComboboxFromValues()
     ' https://msdn.microsoft.com/en-us/vba/access-vba/articles/combobox-removeitem-method-access
     pComboBox.Clear
-    For Each keyAndValue In pKeysAndValues.KeyValuePairs
+    Dim items() As String
+    items = pKeysAndValues.Keys
+    WordBasic.SortArray items()
+    For Each Item In items
         ' https://msdn.microsoft.com/en-us/vba/access-vba/articles/combobox-additem-method-access
-        Call pComboBox.AddItem(keyAndValue.Key)
+        Call pComboBox.AddItem(Item)
     Next
 End Sub
 
@@ -128,7 +131,7 @@ Public Sub Store()
         Dim bb As buildingBlock
         Set bb = GetBuildingBlock(pContentControl.BuildingBlockCategory, val)
         If bb Is Nothing Then
-           Return
+           Exit Sub
         End If
         
         '
