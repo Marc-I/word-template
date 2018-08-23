@@ -19,7 +19,7 @@ Attribute VB_Exposed = False
 ' 25-11-2011 KeyValuePair helper object
 
 Public KeyValuePairs As Collection ' open access but allows iteration
-Public Tag As Variant            ' read/write unrestricted
+Public tag As Variant            ' read/write unrestricted
 
 Private Sub Class_Initialize()
    Set KeyValuePairs = New Collection
@@ -78,14 +78,14 @@ Public Property Get Count() As Long
    Count = KeyValuePairs.Count
 End Property
 
-Public Property Get Items() As Variant     ' for compatibility with Scripting.Dictionary
+Public Property Get items() As Variant     ' for compatibility with Scripting.Dictionary
 Dim vlist As Variant, i As Long
 If Me.Count > 0 Then
    ReDim vlist(0 To Me.Count - 1) ' to get a 0-based array same as scripting.dictionary
    For i = LBound(vlist) To UBound(vlist)
       AssignVariable vlist(i), KeyValuePairs.Item(1 + i).Value ' could be scalar or array or object
    Next i
-   Items = vlist
+   items = vlist
 End If
 End Property
 
