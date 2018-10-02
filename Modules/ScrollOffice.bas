@@ -1,6 +1,6 @@
 Attribute VB_Name = "ScrollOffice"
     
-Public Sub Replace(ByRef cc As contentControl, ByRef dic As Dictionary)
+Public Sub Replace(ByRef cc As contentControl)
     Dim dic As Dictionary
     Set dic = New Dictionary
     Call dic.Add("title", "$scroll.title")
@@ -20,9 +20,10 @@ Public Sub Replace(ByRef cc As contentControl, ByRef dic As Dictionary)
     Debug.Print (t)
     
     Dim vT As Variant
-    Set vT = dic.Item(t)
     Dim v As String
-    v = CStr(vT)
+    v = dic.Item(t)
+    ' Set vT = dic.Item(t)
+    ' v = CStr(vT)
  
     Dim r As Range
     Set r = cc.Range
@@ -45,9 +46,17 @@ Sub ConvertToPageProperties()
             Call Replace(cc)
         Next
     Next
+    
+    Call Selection.GoTo(wdGoToPage, wdGoToAbsolute, 3)
+    Call Selection.EndOf(wdDocument, wdExtend)
+    Dim r As Range
+    Set r = Selection.Range
+    r.Delete
+    r.InsertAfter ("$scroll.content")
+  
 End Sub
 
-Sub ConvertToPageProperties()
+Sub ConvertToConfluence()
     
 
 End Sub
