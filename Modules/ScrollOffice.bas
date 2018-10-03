@@ -19,11 +19,8 @@ Public Sub Replace(ByRef cc As contentControl)
     t = CStr(tV)
     Debug.Print (t)
     
-    Dim vT As Variant
     Dim v As String
     v = dic.Item(t)
-    ' Set vT = dic.Item(t)
-    ' v = CStr(vT)
  
     Dim r As Range
     Set r = cc.Range
@@ -39,14 +36,25 @@ Sub ConvertToPageProperties()
     Dim doc As Document
     Set doc = Application.ActiveDocument
     
-    Dim sr As Range
-    For Each sr In doc.StoryRanges
-        Dim cc As contentControl
-        For Each cc In sr.ContentControls
-            Call Replace(cc)
-        Next
+    ' https://wordmvp.com/FAQs/Customization/ReplaceAnywhere.htm
+    Dim rngStory As Word.Range
+    Dim lngJunk As Long
+    'Fix the skipped blank Header/Footer problem as provided by Peter Hewett
+    lngJunk = ActiveDocument.Sections(1).Headers(1).Range.StoryType
+    'Iterate through all story types in the current document
+    For Each rngStory In ActiveDocument.StoryRanges
+        'Iterate through all linked stories
+        Do
+            Dim cc As contentControl
+            For Each cc In rngStory.ContentControls
+                Call Replace(cc)
+            Next
+            'Get next linked story (if any)
+            Set rngStory = rngStory.NextStoryRange
+        Loop Until rngStory Is Nothing
     Next
     
+    '
     Call Selection.GoTo(wdGoToPage, wdGoToAbsolute, 3)
     Call Selection.EndOf(wdDocument, wdExtend)
     Dim r As Range
