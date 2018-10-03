@@ -32,7 +32,7 @@ Public Sub Replace(ByRef cc As contentControl)
 End Sub
     
     
-Sub ConvertToPageProperties()
+Sub ReplaceContentControls()
     Dim doc As Document
     Set doc = Application.ActiveDocument
     
@@ -53,6 +53,13 @@ Sub ConvertToPageProperties()
             Set rngStory = rngStory.NextStoryRange
         Loop Until rngStory Is Nothing
     Next
+End Sub
+    
+Sub ConvertToPageProperties()
+    Call ReplaceContentControls
+    ' Deleting while Iterating seems a problem. Some content controls stay. So just do it several times
+    Call ReplaceContentControls
+    Call ReplaceContentControls
     
     '
     Call Selection.GoTo(wdGoToPage, wdGoToAbsolute, 3)
