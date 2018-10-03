@@ -56,7 +56,7 @@ Sub ConvertToPageProperties()
     
     '
     Call Selection.GoTo(wdGoToPage, wdGoToAbsolute, 3)
-    Call Selection.EndOf(wdDocument, wdExtend)
+    Call Selection.EndKey(wdStory, wdExtend)
     Dim r As Range
     Set r = Selection.Range
     r.Delete
