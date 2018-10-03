@@ -1,6 +1,12 @@
 Attribute VB_Name = "ScrollOffice"
-    
-Public Sub Replace(ByRef cc As contentControl)
+Public Function StandardDictionary() As Dictionary
+    Dim dic As Dictionary
+    Set dic = New Dictionary
+    Call dic.Add("title", "$scroll.title")
+    Set StandardDictionary = dic
+End Function
+
+Public Function PagePropertiesDictionary() As Dictionary
     Dim dic As Dictionary
     Set dic = New Dictionary
     Call dic.Add("title", "$scroll.title")
@@ -11,7 +17,25 @@ Public Sub Replace(ByRef cc As contentControl)
     Call dic.Add("version", "$scroll.pageproperty.(Version)")
     Call dic.Add("issuingDate", "$scroll.pageproperty.(Ausgabedatum)")
     Call dic.Add("distribution", "$scroll.pageproperty.(Verteiler)")
-  
+    Set PagePropertiesDictionary = dic
+End Function
+
+Public Function ConfluenceDictionary() As Dictionary
+    Dim dic As Dictionary
+    Set dic = New Dictionary
+    Call dic.Add("title", "$scroll.title")
+    Call dic.Add("author", "$scroll.modifier.fullName")
+    Call dic.Add("issuingOffice", "$scroll.space.name")
+    Call dic.Add("scope", "$scroll.space.name")
+    Call dic.Add("classification", "Intern")
+    Call dic.Add("version", "$scroll.version")
+    Call dic.Add("issuingDate", "$scroll.modificationdate")
+    Call dic.Add("distribution", "-")
+    Set ConfluenceDictionary = dic
+End Function
+
+
+Public Sub Replace(ByRef cc As contentControl, ByRef dic As Dictionary)
     Dim tV As Variant
     tV = cc.tag
     
@@ -20,19 +44,21 @@ Public Sub Replace(ByRef cc As contentControl)
     Debug.Print (t)
     
     Dim v As String
-    v = dic.Item(t)
- 
-    Dim r As Range
-    Set r = cc.Range
-        
-    cc.Delete
-    r.Delete
-    r.InsertAfter (v)
+    If dic.Exists(t) Then
+       
+       v = dic.Item(t)
     
+       Dim r As Range
+       Set r = cc.Range
+           
+       cc.Delete
+       r.Delete
+       r.InsertAfter (v)
+    End If
 End Sub
     
     
-Sub ReplaceContentControls()
+Sub ReplaceContentControls(ByRef dic As Dictionary)
     Dim doc As Document
     Set doc = Application.ActiveDocument
     
@@ -47,7 +73,7 @@ Sub ReplaceContentControls()
         Do
             Dim cc As contentControl
             For Each cc In rngStory.ContentControls
-                Call Replace(cc)
+                Call Replace(cc, dic)
             Next
             'Get next linked story (if any)
             Set rngStory = rngStory.NextStoryRange
@@ -55,12 +81,7 @@ Sub ReplaceContentControls()
     Next
 End Sub
     
-Sub ConvertToPageProperties()
-    Call ReplaceContentControls
-    ' Deleting while Iterating seems a problem. Some content controls stay. So just do it several times
-    Call ReplaceContentControls
-    Call ReplaceContentControls
-    
+Sub Replace3EndWithScrollContent()
     '
     Call Selection.GoTo(wdGoToPage, wdGoToAbsolute, 3)
     Call Selection.EndKey(wdStory, wdExtend)
@@ -68,10 +89,43 @@ Sub ConvertToPageProperties()
     Set r = Selection.Range
     r.Delete
     r.InsertAfter ("$scroll.content")
+
+End Sub
+
+Sub ConvertToPageProperties()
+    Dim dic As Dictionary
+    Set dic = PagePropertiesDictionary()
+    
+    Call ReplaceContentControls(dic)
+    ' Deleting while Iterating seems a problem. Some content controls stay. So just do it several times
+    Call ReplaceContentControls(dic)
+    Call ReplaceContentControls(dic)
+    
+    Call Replace3EndWithScrollContent
   
 End Sub
 
-Sub ConvertToConfluence()
+Sub ConvertToStandard()
+    Dim dic As Dictionary
+    Set dic = StandardDictionary()
     
+    Call ReplaceContentControls(dic)
+    ' Deleting while Iterating seems a problem. Some content controls stay. So just do it several times
+    Call ReplaceContentControls(dic)
+    Call ReplaceContentControls(dic)
+
+    Call Replace3EndWithScrollContent
+End Sub
+
+Sub ConvertToConfluence()
+Dim dic As Dictionary
+    Set dic = ConfluenceDictionary()
+    
+    Call ReplaceContentControls(dic)
+    ' Deleting while Iterating seems a problem. Some content controls stay. So just do it several times
+    Call ReplaceContentControls(dic)
+    Call ReplaceContentControls(dic)
+
+    Call Replace3EndWithScrollContent
 
 End Sub
