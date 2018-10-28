@@ -102,6 +102,8 @@ Sub ConvertToPageProperties()
     Call ReplaceContentControls(dic)
     
     Call Replace3EndWithScrollContent
+    
+    Call CreateScrollOfficeStyles
   
 End Sub
 
@@ -115,6 +117,8 @@ Sub ConvertToStandard()
     Call ReplaceContentControls(dic)
 
     Call Replace3EndWithScrollContent
+    
+    Call CreateScrollOfficeStyles
 End Sub
 
 Sub ConvertToConfluence()
@@ -127,5 +131,83 @@ Dim dic As Dictionary
     Call ReplaceContentControls(dic)
 
     Call Replace3EndWithScrollContent
+    
+    Call CreateScrollOfficeStyles
 
 End Sub
+
+Sub CreateScrollOfficeStyles()
+    Dim doc As Document
+    Set doc = Application.ActiveDocument
+    
+    Call CreateOrEditStyle("Scroll List Bullet", "Aufzählungszeichen")
+    Call CreateOrEditStyle("Scroll List Bullet 1", "Aufzählungszeichen")
+    Call CreateOrEditStyle("Scroll List Bullet 2", "Aufzählungszeichen 2")
+    Call CreateOrEditStyle("Scroll List Bullet 3", "Aufzählungszeichen 3")
+    
+    Call CreateOrEditStyle("Scroll List Number", "Listennummer")
+    Call CreateOrEditStyle("Scroll List Number 1", "Listennummer")
+    Call CreateOrEditStyle("Scroll List Number 2", "Listennummer 2")
+    Call CreateOrEditStyle("Scroll List Number 3", "Listennummer 3")
+    
+
+    Dim oStyle As Style
+    petrolLight = RGB(217, 233, 237)
+    ockerLight = RGB(240, 232, 227)
+    redLight = RGB(244, 226, 226)
+    
+    Call CreateOrEditTable("Scroll Tip", petrolLight)
+    Call CreateOrEditTable("Scroll Info", ockerLight)
+    Call CreateOrEditTable("Scroll Note", ockerLight)
+    Call CreateOrEditTable("Scroll Warning", redLight)
+    
+End Sub
+
+Sub CreateOrEditTable(styleName As String, color)
+    Set oStyle = CreateOrEditTableStyle(styleName, "Normale Tabelle")
+    oStyle.Table.Shading.BackgroundPatternColor = color
+End Sub
+
+
+Function CreateOrEditTableStyle(styleName As String, baseStyleName As String) As Style
+    Dim doc As Document
+    Set doc = Application.ActiveDocument
+    
+    Dim oStyle As Style
+    If StyleExists(styleName) Then
+        Debug.Print (doc.Styles(styleName))
+        Set oStyle = doc.Styles(styleName)
+    Else
+        Set oStyle = doc.Styles.Add(name:=styleName, Type:=WdStyleType.wdStyleTypeTable)
+    End If
+    oStyle.baseStyle = baseStyleName
+    Set CreateOrEditTableStyle = oStyle
+End Function
+
+
+Function CreateOrEditStyle(styleName As String, baseStyleName As String) As Style
+    Dim doc As Document
+    Set doc = Application.ActiveDocument
+    
+    Dim oStyle As Style
+    If StyleExists(styleName) Then
+        Set oStyle = doc.Styles(styleName)
+    Else
+        Set oStyle = doc.Styles.Add(styleName, WdStyleType.wdStyleTypeParagraphOnly)
+    End If
+    oStyle.baseStyle = baseStyleName
+    Set CreateOrEditStyle = oStyle
+End Function
+
+Function StyleExists(styleName As String) As Boolean
+    Dim oStyle As Style
+    StyleExists = False
+    For Each oStyle In ActiveDocument.Styles
+        If oStyle.NameLocal = styleName Then
+            StyleExists = True
+            Exit Function
+        End If
+    Next oStyle
+    Exit Function
+End Function
+
